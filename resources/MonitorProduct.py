@@ -5,8 +5,7 @@ from datetime import datetime
 from database.models import *
 from database.schema import *
 from app import db
-
-
+from barcode.barcode_scnnaer_image import *
 class MonitorProductApi(Resource):
     def get(self):
         jsonFinalResponse = list()
@@ -27,10 +26,20 @@ class MonitorProductApi(Resource):
         return jsonFinalResponse, 200
 
     def post(self):
-        new_monitor = Monitor(start_date=datetime.now())
-        db.session.add(new_monitor)
-        db.session.commit()
-        return monitor_schema.dump(new_monitor)
+        runScanner("barcode1.jpg")
+        product_id = request.json['product_id']
+        monitor_id = request.json['monitor_id']
+        all_product_with_monitor = db.session.query(MonitorProduct).filter(MonitorProduct.monitor_id == monitor_id).all()
+        print(all_product_with_monitor)
+        if all_product_with_monitor:
+            for single_product_with_monitor in all_product_with_monitor:
+                if single_product_with_monitor.product_id == product_id :
+                    single_product_with_monitor.number += 1
+                    db.session.commit()
+        else :
+            db.session.add(MonitorProduct(product_id,monitor_id,1))
+            db.session.commit()
+        return "added successfully", 200
 
 
 class MonitorProductDetailsApi(Resource):

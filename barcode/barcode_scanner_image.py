@@ -2,6 +2,7 @@
 from pyzbar import pyzbar
 import argparse
 import cv2
+
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", required=True,
@@ -9,6 +10,7 @@ ap.add_argument("-i", "--image", required=True,
 args = vars(ap.parse_args())
 
 # load the input image
+print(type(args["image"]))
 image = cv2.imread(args["image"])
 # find the barcodes in the image and decode each of the barcodes
 barcodes = pyzbar.decode(image)
